@@ -8,19 +8,19 @@
   </url>
   <url>
     <loc>https://forrest.hashnode.dev/benign-tryhackme</loc>
-    <lastmod>$(date +%F)</lastmod>
+    <lastmod>2025-08-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://forrest.hashnode.dev/investigating-with-splunk-tryhackme</loc>
-    <lastmod>$(date +%F)</lastmod>
+    <lastmod>2025-08-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://forrest.hashnode.dev/bsides-cheltenham-2025-a-cyber-security-event-not-to-be-missed</loc>
-    <lastmod>$(date +%F)</lastmod>
+    <lastmod>2025-07-25</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
