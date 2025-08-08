@@ -3,7 +3,7 @@ name: Update posts from Hashnode (API)
 on:
   workflow_dispatch:
   schedule:
-    - cron: '17 6 * * *'   # daily at 06:17 UTC
+    - cron: '17 6 * * *'
   push:
     branches: [ "main" ]
 
@@ -17,109 +17,69 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Fetch posts via Hashnode API and generate posts.json
+      - name: Fetch posts via Hashnode API -> posts.json
         run: |
+          set -euxo pipefail
           python3 - <<'PY'
           import json, sys, urllib.request
 
-          HOST = "forrest.hashnode.dev"      # your blog host
-          USERNAME = "forrest"               # your Hashnode username (used for legacy fallback)
+          HOST = "forrest.hashnode.dev"      # your blog host (correct)
+          USERNAME = "forrestcaffray"        # your Hashnode username (correct)
           LIMIT = 24
 
-          def post_json(url, payload, headers=None):
-              req = urllib.request.Request(url, data=json.dumps(payload).encode("utf-8"), headers=headers or {}, method="POST")
+          def post_json(url, payload):
+              req = urllib.request.Request(
+                  url,
+                  data=json.dumps(payload).encode("utf-8"),
+                  headers={"Content-Type":"application/json","Accept":"application/json"},
+                  method="POST"
+              )
               with urllib.request.urlopen(req, timeout=30) as r:
                   return json.loads(r.read().decode("utf-8"))
 
           items = []
 
-          # --- Try the modern GraphQL endpoint first ---
+          # Try modern GraphQL first
           try:
-              gql_url = "https://gql.hashnode.com/"
-              headers = {"Content-Type":"application/json","Accept":"application/json"}
-              query = """
-              query ($host: String!, $first: Int!) {
-                publication(host: $host) {
-                  posts(first: $first) {
-                    edges {
-                      node {
-                        title
-                        brief
-                        slug
-                        url
-                        publishedAt
-                        tags { name }
+              data = post_json(
+                  "https://gql.hashnode.com/",
+                  {
+                    "query": """
+                      query ($host: String!, $first: Int!) {
+                        publication(host: $host) {
+                          posts(first: $first) {
+                            edges {
+                              node { title slug url publishedAt tags { name } }
+                            }
+                          }
+                        }
                       }
-                    }
-                  }
-                }
-              }
-              """
-              data = post_json(gql_url, {"query": query, "variables": {"host": HOST, "first": LIMIT}}, headers)
-              edges = (data.get("data") or {}).get("publication") or {}
-              edges = (edges.get("posts") or {}).get("edges") or []
+                    """,
+                    "variables": {"host": HOST, "first": LIMIT},
+                  },
+              )
+              edges = (((data.get("data") or {}).get("publication") or {}).get("posts") or {}).get("edges") or []
               for e in edges:
                   n = e.get("node") or {}
                   url = n.get("url") or f"https://{HOST}/{n.get('slug','')}"
                   items.append({
-                    "title": (n.get("title") or "").strip(),
-                    "url": url,
-                    "date": (n.get("publishedAt") or "").strip(),
-                    "tags": [t.get("name","") for t in (n.get("tags") or []) if t and t.get("name")]
+                      "title": (n.get("title") or "").strip(),
+                      "url": url,
+                      "date": (n.get("publishedAt") or "").strip(),
+                      "tags": [t.get("name","") for t in (n.get("tags") or []) if t and t.get("name")]
                   })
           except Exception as e:
-              print("GraphQL fetch failed, will try legacy API:", e, file=sys.stderr)
+              print("GraphQL fetch failed:", e, file=sys.stderr)
 
-          # --- Fallback to legacy API if needed ---
+          # Fallback to legacy API if needed
           if not items:
               try:
-                  v1_url = "https://api.hashnode.com/"
-                  headers = {"Content-Type":"application/json","Accept":"application/json"}
-                  query = """
-                  query ($username: String!, $page: Int!) {
-                    user(username: $username) {
-                      publication {
-                        posts(page: $page) {
-                          title
-                          brief
-                          slug
-                          dateAdded
-                          tags { name }
-                        }
-                      }
-                    }
-                  }
-                  """
-                  data = post_json(v1_url, {"query": query, "variables": {"username": USERNAME, "page": 0}}, headers)
-                  posts = (((data.get("data") or {}).get("user") or {}).get("publication") or {}).get("posts") or []
-                  for p in posts[:LIMIT]:
-                      url = f"https://{HOST}/{p.get('slug','')}"
-                      items.append({
-                        "title": (p.get("title") or "").strip(),
-                        "url": url,
-                        "date": (p.get("dateAdded") or "").strip(),
-                        "tags": [t.get("name","") for t in (p.get("tags") or []) if t and t.get("name")]
-                      })
-              except Exception as e:
-                  print("Legacy API fetch also failed:", e, file=sys.stderr)
-
-          if not items:
-              print("No items fetched from Hashnode API(s).", file=sys.stderr)
-              sys.exit(1)
-
-          # Keep latest LIMIT, write posts.json
-          open("posts.json","w").write(json.dumps(items[:LIMIT], indent=2))
-          print(f"Wrote posts.json with {len(items[:LIMIT])} items")
-          PY
-
-      - name: Commit changes
-        run: |
-          if git diff --quiet posts.json 2>/dev/null; then
-            echo "No changes in posts.json"
-          else
-            git config user.name "github-actions"
-            git config user.email "actions@users.noreply.github.com"
-            git add posts.json
-            git commit -m "Update posts.json from Hashnode (API)"
-            git push
-          fi
+                  data = post_json(
+                      "https://api.hashnode.com/",
+                      {
+                        "query": """
+                          query ($username: String!, $page: Int!) {
+                            user(username: $username) {
+                              publication {
+                                posts(page: $page) {
+                                  title slug dateAdded tags { name }
