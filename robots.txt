@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://forrestcaffray.github.io/sitemap.xml
