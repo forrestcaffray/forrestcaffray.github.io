@@ -17,69 +17,27 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Fetch posts via Hashnode API -> posts.json
+      - name: Run fetch script
         run: |
           set -euxo pipefail
-          python3 - <<'PY'
-          import json, sys, urllib.request
+          python3 scripts/fetch_hashnode.py
 
-          HOST = "forrest.hashnode.dev"      # your blog host (correct)
-          USERNAME = "forrestcaffray"        # your Hashnode username (correct)
-          LIMIT = 24
+      - name: Show file
+        run: |
+          ls -l
+          echo "----- posts.json (first 200 bytes) -----"
+          head -c 200 posts.json || true
+          echo
 
-          def post_json(url, payload):
-              req = urllib.request.Request(
-                  url,
-                  data=json.dumps(payload).encode("utf-8"),
-                  headers={"Content-Type":"application/json","Accept":"application/json"},
-                  method="POST"
-              )
-              with urllib.request.urlopen(req, timeout=30) as r:
-                  return json.loads(r.read().decode("utf-8"))
-
-          items = []
-
-          # Try modern GraphQL first
-          try:
-              data = post_json(
-                  "https://gql.hashnode.com/",
-                  {
-                    "query": """
-                      query ($host: String!, $first: Int!) {
-                        publication(host: $host) {
-                          posts(first: $first) {
-                            edges {
-                              node { title slug url publishedAt tags { name } }
-                            }
-                          }
-                        }
-                      }
-                    """,
-                    "variables": {"host": HOST, "first": LIMIT},
-                  },
-              )
-              edges = (((data.get("data") or {}).get("publication") or {}).get("posts") or {}).get("edges") or []
-              for e in edges:
-                  n = e.get("node") or {}
-                  url = n.get("url") or f"https://{HOST}/{n.get('slug','')}"
-                  items.append({
-                      "title": (n.get("title") or "").strip(),
-                      "url": url,
-                      "date": (n.get("publishedAt") or "").strip(),
-                      "tags": [t.get("name","") for t in (n.get("tags") or []) if t and t.get("name")]
-                  })
-          except Exception as e:
-              print("GraphQL fetch failed:", e, file=sys.stderr)
-
-          # Fallback to legacy API if needed
-          if not items:
-              try:
-                  data = post_json(
-                      "https://api.hashnode.com/",
-                      {
-                        "query": """
-                          query ($username: String!, $page: Int!) {
-                            user(username: $username) {
-                              publication {
-                                posts(page: $page) {
-                                  title slug dateAdded tags { name }
+      - name: Commit posts.json
+        run: |
+          set -euxo pipefail
+          if [ -f posts.json ]; then
+            git config user.name "github-actions"
+            git config user.email "actions@users.noreply.github.com"
+            git add posts.json
+            git commit -m "Update posts.json from Hashnode API" || echo "Nothing to commit"
+            git push || true
+          else
+            echo "posts.json not found" >&2
+            exit 1
