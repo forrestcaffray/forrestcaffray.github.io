@@ -29,7 +29,7 @@ jobs:
           head -c 200 posts.json || true
           echo
 
-      - name: Commit posts.json
+            - name: Commit posts.json
         run: |
           set -euxo pipefail
           if [ -f posts.json ]; then
@@ -41,3 +41,4 @@ jobs:
           else
             echo "posts.json not found" >&2
             exit 1
+          fi
