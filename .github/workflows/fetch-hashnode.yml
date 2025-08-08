@@ -28,6 +28,21 @@ jobs:
           echo "----- posts.json (first 200 bytes) -----"
           head -c 200 posts.json || true
 
+      - name: Generate sitemap.xml
+        run: |
+          echo '<?xml version="1.0" encoding="UTF-8"?>' > sitemap.xml
+          echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' >> sitemap.xml
+          # Home page
+          echo '  <url>' >> sitemap.xml
+          echo '    <loc>https://forrestcaffray.github.io/</loc>' >> sitemap.xml
+          echo "    <lastmod>$(date +%F)</lastmod>" >> sitemap.xml
+          echo '    <changefreq>weekly</changefreq>' >> sitemap.xml
+          echo '    <priority>1.0</priority>' >> sitemap.xml
+          echo '  </url>' >> sitemap.xml
+          # From posts.json
+          jq -r '.[] | "  <url>\n    <loc>\(.url)</loc>\n    <lastmod>$(date +%F)</lastmod>\n    <changefreq>monthly</changefreq>\n    <priority>0.8</priority>\n  </url>"' posts.json >> sitemap.xml
+          echo '</urlset>' >> sitemap.xml
+
       - name: Commit posts.json
         run: |
           git config --global user.name "forrestcaffray"
