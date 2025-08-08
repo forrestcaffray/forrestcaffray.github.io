@@ -3,6 +3,8 @@
     "title": "Benign - TryHackMe",
     "url": "https://forrest.hashnode.dev/benign-tryhackme",
     "date": "2025-08-07T11:58:06.803Z",
+    "brief": "Link to room: https://tryhackme.com/room/benign\n\nOne of the client\u2019s IDS indicated a potentially suspicious process execution indicating one of the hosts from the HR department was compromised. Some tools related to network information gathering / sc...",
+    "image": "https://cdn.hashnode.com/res/hashnode/image/upload/v1754478101786/83508194-7d2e-414b-a791-65b22025d9bc.png",
     "tags": [
       "tryhackme",
       "TryHackMe Walkthrough",
@@ -14,6 +16,8 @@
     "title": "Investigating with Splunk - TryHackMe",
     "url": "https://forrest.hashnode.dev/investigating-with-splunk-tryhackme",
     "date": "2025-08-05T16:22:51.956Z",
+    "brief": "Link to room: https://tryhackme.com/room/investigatingwithsplunk\nLet\u2019s do some Splunking shall we!\n\nSOC Analyst Johny has observed some anomalous behaviours in the logs of a few windows machines. It looks like the adversary has access to some of thes...",
+    "image": "https://cdn.hashnode.com/res/hashnode/image/upload/v1754411546734/2d07884c-adf7-47a6-a859-4a378c39be61.png",
     "tags": [
       "Technical Writeup",
       "tryhackme",
@@ -25,6 +29,8 @@
     "title": "BSides Cheltenham 2025 - A cyber security event not to be missed!",
     "url": "https://forrest.hashnode.dev/bsides-cheltenham-2025-a-cyber-security-event-not-to-be-missed",
     "date": "2025-07-25T18:09:31.324Z",
+    "brief": "#BSidesChelt\nIt\u2019s the 18th July 2025 and I have embarked on my wee trip to Cheltenham. Having been there once before I was a little acquainted with the town. All thanks to Hack The Box of course! They host CTF (Capture the Flag) events there which ha...",
+    "image": "https://cdn.hashnode.com/res/hashnode/image/upload/v1753438262753/19b513eb-0f8e-4329-9040-2a8f6ddf1cfb.jpeg",
     "tags": [
       "BSidesChelt",
       "Bsides",
