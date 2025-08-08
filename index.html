@@ -1,128 +1,80 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Forrest Caffray</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Forrest Caffray — Cybersecurity Portfolio</title>
+  <meta name="description" content="TryHackMe & HTB write-ups, BSides notes, and security projects." />
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #0d1117;
-      color: #c9d1d9;
-      margin: 0;
-      padding: 0;
-    }
-    .container {
-      max-width: 1100px;
-      margin: auto;
-      padding: 20px;
-    }
-    h1 {
-      color: #ffffff;
-    }
-    h2 {
-      margin-top: 30px;
-      color: #ffffff;
-    }
-    .posts {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
-    }
-    .post {
-      background-color: #161b22;
-      border-radius: 10px;
-      padding: 15px;
-      flex: 1 1 calc(33% - 20px);
-      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-      transition: transform 0.2s;
-      cursor: pointer;
-    }
-    .post:hover {
-      transform: translateY(-5px);
-    }
-    .post img {
-      max-width: 100%;
-      border-radius: 8px;
-    }
-    .post-title {
-      font-weight: bold;
-      margin-top: 10px;
-      color: #58a6ff;
-      text-decoration: none;
-      display: block;
-    }
-    .post-date {
-      font-size: 0.9em;
-      color: #8b949e;
-    }
-    .tags {
-      margin-top: 10px;
-    }
-    .tag {
-      background-color: #30363d;
-      border-radius: 5px;
-      padding: 2px 6px;
-      font-size: 0.8em;
-      margin-right: 5px;
-      display: inline-block;
-    }
-    .links {
-      margin-top: 20px;
-    }
-    .view-all {
-      display: inline-block;
-      margin-top: 20px;
-      padding: 10px 15px;
-      background-color: #238636;
-      color: white;
-      border-radius: 6px;
-      text-decoration: none;
-      font-weight: bold;
-    }
-    .view-all:hover {
-      background-color: #2ea043;
-    }
+    :root{--bg:#0b1220;--card:#101a2b;--fg:#e5ecff;--muted:#9db1d8;--acc:#84a9ff;--bd:rgba(255,255,255,.07)}
+    html,body{margin:0;height:100%}
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;background:var(--bg);color:var(--fg)}
+    .wrap{max-width:1100px;margin:0 auto;padding:36px 24px}
+    h1{margin:0 0 8px 0} .muted{color:var(--muted)}
+    .grid{display:grid;gap:18px;grid-template-columns:repeat(auto-fill,minmax(280px,1fr))}
+    .card{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:16px}
+    .card a{color:var(--acc);text-decoration:none}
+    .pill{display:inline-block;margin-right:6px;margin-top:8px;padding:4px 10px;border-radius:999px;background:rgba(132,169,255,.12);color:var(--acc);font-size:12px}
+    .card-img{width:100%;height:160px;object-fit:cover;border-radius:12px;margin-bottom:12px;display:block;background:#0d1528}
+    .excerpt{color:var(--muted);font-size:14px;line-height:1.35;margin-top:6px}
+    header{margin-bottom:18px}
+    h2{margin-top:24px}
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Forrest Caffray</h1>
-    <p>TryHackMe & HTB write-ups, BSides notes, and projects.</p>
+  <div class="wrap">
+    <header>
+      <h1>Forrest Caffray</h1>
+      <p class="muted">TryHackMe & HTB write-ups, BSides notes, and projects.</p>
+    </header>
 
-    <h2>Latest posts</h2>
-    <div class="posts" id="posts"></div>
+    <main>
+      <h2>Latest posts</h2>
+      <div id="posts" class="grid" aria-live="polite">
+        <div class="card"><strong>First run pending.</strong><br><span class="muted">posts.json will appear after the workflow runs.</span></div>
+      </div>
 
-    <a class="view-all" href="https://forrest.hashnode.dev" target="_blank">View all posts</a>
-
-    <h2>Links</h2>
-    <p>Primary blog: <a href="https://forrest.hashnode.dev" target="_blank">Hashnode</a> · Cross-posts:
-      <a href="https://dev.to/forrestcaffray" target="_blank">Dev.to</a> · 
-      <a href="https://medium.com/@forrestcaffray" target="_blank">Medium</a>
-    </p>
+      <h2>Links</h2>
+      <p>
+        Primary blog: <a href="https://forrest.hashnode.dev" target="_blank" rel="noopener">Hashnode</a> ·
+        Cross-posts: <a href="https://dev.to/forrestcaffray" target="_blank" rel="noopener">Dev.to</a> ·
+        <a href="https://medium.com/@forrestcaffray" target="_blank" rel="noopener">Medium</a>
+      </p>
+    </main>
   </div>
 
   <script>
-    fetch('posts.json')
-      .then(response => response.json())
-      .then(posts => {
-        const postsContainer = document.getElementById('posts');
-        posts.forEach(post => {
-          const card = document.createElement('div');
-          card.className = 'post';
-          card.onclick = () => window.open(post.link, '_blank');
-          card.innerHTML = `
-            ${post.coverImage ? `<img src="${post.coverImage}" alt="${post.title}">` : ''}
-            <a href="${post.link}" target="_blank" class="post-title">${post.title}</a>
-            <div class="post-date">${post.date}</div>
-            <p>${post.brief}</p>
-            <div class="tags">
-              ${post.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
-            </div>
-          `;
-          postsContainer.appendChild(card);
-        });
-      });
+  (async () => {
+    const el = document.getElementById('posts');
+    const clip = (s, n=180) => s && s.length > n ? s.slice(0, n - 1) + "…" : (s || "");
+    const fmt = d => {
+      try { return new Date(d).toLocaleDateString(); } catch { return ""; }
+    };
+
+    try {
+      const res = await fetch('posts.json', { cache: 'no-store' });
+      if (!res.ok) throw new Error('No posts.json yet');
+      const items = await res.json();
+
+      if (!Array.isArray(items) || items.length === 0) {
+        el.innerHTML = `<div class="card"><strong>No posts found.</strong></div>`;
+        return;
+      }
+
+      el.innerHTML = items.map(p => `
+        <article class="card">
+          ${p.image ? `<img class="card-img" src="${p.image}" alt="">` : ``}
+          <h3><a href="${p.url}" target="_blank" rel="noopener">${p.title}</a></h3>
+          <div class="muted">${fmt(p.date)}</div>
+          ${p.brief ? `<p class="excerpt">${clip(p.brief, 180)}</p>` : ``}
+          <div>${(p.tags||[]).slice(0,3).map(t=>`<span class="pill">${t}</span>`).join('')}</div>
+        </article>
+      `).join('');
+    } catch (e) {
+      // Keep the placeholder if fetch fails
+      console.warn('posts.json not ready yet:', e);
+    }
+  })();
   </script>
 </body>
 </html>
