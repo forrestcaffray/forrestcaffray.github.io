@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Forrest Caffray — Cybersecurity Portfolio</title>
+<style>
+  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;margin:0;background:#0b1220;color:#e5ecff}
+  .wrap{max-width:900px;margin:0 auto;padding:32px}
+  h1{margin:0 0 8px 0} .muted{color:#9db1d8}
+  .grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
+  .card{background:#101a2b;border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:16px}
+  .card a{color:#84a9ff;text-decoration:none}
+  .pill{display:inline-block;margin-right:6px;margin-top:8px;padding:4px 10px;border-radius:999px;background:rgba(132,169,255,.12);color:#84a9ff;font-size:12px}
+</style>
+<div class="wrap">
+  <h1>Forrest Caffray</h1>
+  <p class="muted">TryHackMe & HTB write-ups, BSides notes, and projects.</p>
+
+  <h2>Latest posts</h2>
+  <div id="posts" class="grid" aria-live="polite"></div>
+
+  <h2>Links</h2>
+  <p>
+    Primary blog: <a href="https://forrest.hashnode.dev/" style="color:#84a9ff">Hashnode</a> ·
+    Cross-posts: <a href="https://dev.to/forrestcaffray" style="color:#84a9ff">Dev.to</a> ·
+    <a href="https://medium.com/@forrestcaffray" style="color:#84a9ff">Medium</a>
+  </p>
+</div>
+
+<script>
+(async () => {
+  const el = document.getElementById('posts');
+  try {
+    const res = await fetch('posts.json', { cache: 'no-store' });
+    if (!res.ok) throw new Error('No posts.json yet');
+    const items = await res.json();
+    el.innerHTML = items.map(p => `
+      <article class="card">
+        <h3><a href="${p.url}" target="_blank" rel="noopener">${p.title}</a></h3>
+        <div class="muted">${new Date(p.date).toLocaleDateString()}</div>
+        <div>${(p.tags||[]).slice(0,3).map(t=>`<span class="pill">${t}</span>`).join('')}</div>
+      </article>
+    `).join('');
+  } catch (e) {
+    el.innerHTML = `<div class="card"><strong>First run pending.</strong><br><span class="muted">posts.json will appear after the workflow runs (1–3 minutes).</span></div>`;
+  }
+})();
+</script>
+</html>
