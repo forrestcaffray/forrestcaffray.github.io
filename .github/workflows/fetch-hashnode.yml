@@ -17,10 +17,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Fetch RSS & generate posts.json
+            - name: Fetch RSS & generate posts.json
         run: |
           RSS_URL="https://forrest.hashnode.dev/rss.xml"
-          curl -A "Mozilla/5.0" -sL "$RSS_URL" -o rss.xml
+          echo "Fetching from: $RSS_URL"
+          curl -A "Mozilla/5.0" -sL -D headers.txt "$RSS_URL" -o rss.xml
+          echo "----- HEADERS -----"
+          cat headers.txt
+          echo "----- FIRST 400 CHARS -----"
+          head -c 400 rss.xml || true
           python3 - <<'PY'
           import xml.etree.ElementTree as ET, json
           from datetime import datetime
@@ -41,6 +46,7 @@ jobs:
           items = sorted(items, key=lambda x: x['date'], reverse=True)[:24]
           open('posts.json', 'w').write(json.dumps(items, indent=2))
           PY
+
 
       - name: Commit changes
         run: |
