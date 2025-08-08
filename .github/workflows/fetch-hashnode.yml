@@ -1,4 +1,4 @@
-name: Update posts from Hashnode RSS (debug)
+name: Update posts from Hashnode (API)
 
 on:
   workflow_dispatch:
@@ -17,60 +17,102 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Fetch RSS (with debug)
-        run: |
-          set -euxo pipefail
-          RSS_URL="https://forrest.hashnode.dev/rss.xml"   # <-- your feed
-          echo "Fetching from: $RSS_URL"
-
-          # Fetch with redirects + browser UA + compression
-          curl -A "Mozilla/5.0" -sL --compressed -D headers.txt "$RSS_URL" -o rss.xml
-
-          echo "----- HEADERS -----"
-          cat headers.txt || true
-
-          echo "----- FIRST 400 CHARS -----"
-          head -c 400 rss.xml || true
-          echo
-          echo "----- FILE TYPE -----"
-          file rss.xml || true
-
-      - name: Generate posts.json
+      - name: Fetch posts via Hashnode API and generate posts.json
         run: |
           python3 - <<'PY'
-          import xml.etree.ElementTree as ET, json, sys
-          from datetime import datetime
+          import json, sys, urllib.request
 
-          try:
-              root = ET.parse('rss.xml').getroot()
-          except Exception as e:
-              print("XML parse failed:", e)
-              # Print the first ~800 characters to the log to see what's inside
-              try:
-                  print(open('rss.xml','rb').read(800).decode('utf-8','replace'))
-              except Exception:
-                  pass
-              sys.exit(1)
+          HOST = "forrest.hashnode.dev"      # your blog host
+          USERNAME = "forrest"               # your Hashnode username (used for legacy fallback)
+          LIMIT = 24
+
+          def post_json(url, payload, headers=None):
+              req = urllib.request.Request(url, data=json.dumps(payload).encode("utf-8"), headers=headers or {}, method="POST")
+              with urllib.request.urlopen(req, timeout=30) as r:
+                  return json.loads(r.read().decode("utf-8"))
 
           items = []
-          for item in root.findall('.//item'):
-              title = (item.findtext('title') or '').strip()
-              link  = (item.findtext('link') or '').strip()
-              pub   = (item.findtext('pubDate') or '').strip()
-              try:
-                  date = datetime.strptime(pub, '%a, %d %b %Y %H:%M:%S %Z').isoformat()
-              except Exception:
-                  date = pub
-              tags = [c.text.strip() for c in item.findall('category') if c is not None and c.text]
-              items.append({'title': title, 'url': link, 'date': date, 'tags': tags})
 
-          items = sorted(items, key=lambda x: x['date'], reverse=True)[:24]
-          open('posts.json', 'w').write(json.dumps(items, indent=2))
-          print("Wrote posts.json with", len(items), "items")
+          # --- Try the modern GraphQL endpoint first ---
+          try:
+              gql_url = "https://gql.hashnode.com/"
+              headers = {"Content-Type":"application/json","Accept":"application/json"}
+              query = """
+              query ($host: String!, $first: Int!) {
+                publication(host: $host) {
+                  posts(first: $first) {
+                    edges {
+                      node {
+                        title
+                        brief
+                        slug
+                        url
+                        publishedAt
+                        tags { name }
+                      }
+                    }
+                  }
+                }
+              }
+              """
+              data = post_json(gql_url, {"query": query, "variables": {"host": HOST, "first": LIMIT}}, headers)
+              edges = (data.get("data") or {}).get("publication") or {}
+              edges = (edges.get("posts") or {}).get("edges") or []
+              for e in edges:
+                  n = e.get("node") or {}
+                  url = n.get("url") or f"https://{HOST}/{n.get('slug','')}"
+                  items.append({
+                    "title": (n.get("title") or "").strip(),
+                    "url": url,
+                    "date": (n.get("publishedAt") or "").strip(),
+                    "tags": [t.get("name","") for t in (n.get("tags") or []) if t and t.get("name")]
+                  })
+          except Exception as e:
+              print("GraphQL fetch failed, will try legacy API:", e, file=sys.stderr)
+
+          # --- Fallback to legacy API if needed ---
+          if not items:
+              try:
+                  v1_url = "https://api.hashnode.com/"
+                  headers = {"Content-Type":"application/json","Accept":"application/json"}
+                  query = """
+                  query ($username: String!, $page: Int!) {
+                    user(username: $username) {
+                      publication {
+                        posts(page: $page) {
+                          title
+                          brief
+                          slug
+                          dateAdded
+                          tags { name }
+                        }
+                      }
+                    }
+                  }
+                  """
+                  data = post_json(v1_url, {"query": query, "variables": {"username": USERNAME, "page": 0}}, headers)
+                  posts = (((data.get("data") or {}).get("user") or {}).get("publication") or {}).get("posts") or []
+                  for p in posts[:LIMIT]:
+                      url = f"https://{HOST}/{p.get('slug','')}"
+                      items.append({
+                        "title": (p.get("title") or "").strip(),
+                        "url": url,
+                        "date": (p.get("dateAdded") or "").strip(),
+                        "tags": [t.get("name","") for t in (p.get("tags") or []) if t and t.get("name")]
+                      })
+              except Exception as e:
+                  print("Legacy API fetch also failed:", e, file=sys.stderr)
+
+          if not items:
+              print("No items fetched from Hashnode API(s).", file=sys.stderr)
+              sys.exit(1)
+
+          # Keep latest LIMIT, write posts.json
+          open("posts.json","w").write(json.dumps(items[:LIMIT], indent=2))
+          print(f"Wrote posts.json with {len(items[:LIMIT])} items")
           PY
 
       - name: Commit changes
-        if: success()
         run: |
           if git diff --quiet posts.json 2>/dev/null; then
             echo "No changes in posts.json"
@@ -78,15 +120,6 @@ jobs:
             git config user.name "github-actions"
             git config user.email "actions@users.noreply.github.com"
             git add posts.json
-            git commit -m "Update posts.json from Hashnode RSS"
+            git commit -m "Update posts.json from Hashnode (API)"
             git push
           fi
-
-      - name: Upload rss.xml (always)
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: rss-debug
-          path: |
-            rss.xml
-            headers.txt
