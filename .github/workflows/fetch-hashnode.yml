@@ -20,7 +20,7 @@ jobs:
       - name: Fetch RSS & generate posts.json
         run: |
           RSS_URL="https://forrest.hashnode.dev/rss.xml"
-          curl -sL "$RSS_URL" -o rss.xml
+          curl -A "Mozilla/5.0" -sL "$RSS_URL" -o rss.xml
           python3 - <<'PY'
           import xml.etree.ElementTree as ET, json
           from datetime import datetime
