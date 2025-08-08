@@ -1,125 +1,154 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Primary SEO -->
-  <title>Forrest Caffray — Cybersecurity Portfolio</title>
-  <meta name="description" content="TryHackMe & HackTheBox write-ups, BSides notes, and security projects from Forrest Caffray." />
-  <meta name="author" content="Forrest Caffray" />
+<title>Forrest Caffray — Cybersecurity Portfolio</title>
+<meta name="description" content="TryHackMe & HackTheBox write-ups, BSides notes, and security projects from Forrest Caffray." />
+<meta name="author" content="Forrest Caffray" />
 
-  <!-- Open Graph (for social shares) -->
-  <meta property="og:title" content="Forrest Caffray — Cybersecurity Portfolio" />
-  <meta property="og:description" content="CTF write-ups, security research, and projects." />
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://forrestcaffray.github.io/" />
-  <meta property="og:image" content="https://forrestcaffray.github.io/cover.jpg" />
+<!-- Open Graph -->
+<meta property="og:title" content="Forrest Caffray — Cybersecurity Portfolio" />
+<meta property="og:description" content="CTF write-ups, security research, and projects." />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://forrestcaffray.github.io/" />
+<meta property="og:image" content="https://forrestcaffray.github.io/cover.jpg" />
 
-  <!-- Twitter Card (also privacy-safe) -->
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Forrest Caffray — Cybersecurity Portfolio" />
-  <meta name="twitter:description" content="CTF write-ups, security research, and projects." />
-  <meta name="twitter:image" content="https://forrestcaffray.github.io/cover.jpg" />
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Forrest Caffray — Cybersecurity Portfolio" />
+<meta name="twitter:description" content="CTF write-ups, security research, and projects." />
+<meta name="twitter:image" content="https://forrestcaffray.github.io/cover.jpg" />
 
-  <!-- Robots & sitemap -->
-  <meta name="robots" content="index, follow" />
-  <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml" />
+<meta name="robots" content="index, follow" />
+<link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml" />
 
-  <!-- Styles -->
-  <style>
-    :root{--bg:#0b1220;--card:#101a2b;--fg:#e5ecff;--muted:#9db1d8;--acc:#84a9ff;--bd:rgba(255,255,255,.07)}
-    html,body{margin:0;height:100%}
-    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;background:var(--bg);color:var(--fg)}
-    .wrap{max-width:1100px;margin:0 auto;padding:36px 24px}
-    h1{margin:0 0 8px 0} .muted{color:var(--muted)}
-    .grid{display:grid;gap:18px;grid-template-columns:repeat(auto-fill,minmax(280px,1fr))}
-    .card{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:16px}
-    .card a{color:var(--acc);text-decoration:none}
-    .pill{display:inline-block;margin-right:6px;margin-top:8px;padding:4px 10px;border-radius:999px;background:rgba(132,169,255,.12);color:var(--acc);font-size:12px}
-    .card-img{width:100%;height:160px;object-fit:cover;border-radius:12px;margin-bottom:12px;display:block;background:#0d1528}
-    .excerpt{color:var(--muted);font-size:14px;line-height:1.35;margin-top:6px}
-    header{margin-bottom:18px}
-    h2{margin-top:24px}
-    .view-all{display:inline-block;margin-top:20px;padding:10px 15px;background-color:#238636;color:white;border-radius:6px;text-decoration:none;font-weight:bold}
-    .view-all:hover{background-color:#2ea043}
-  </style>
+<style>
+:root {
+  --bg: #0b1220;
+  --card: #101a2b;
+  --fg: #e5ecff;
+  --muted: #9db1d8;
+  --acc: #84a9ff;
+  --bd: rgba(255,255,255,.07);
+}
 
-  <!-- Structured data for search engines (no tracking) -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "Person",
-    "name": "Forrest Caffray",
-    "url": "https://forrestcaffray.github.io/",
-    "sameAs": [
-      "https://forrest.hashnode.dev",
-      "https://dev.to/forrestcaffray",
-      "https://medium.com/@forrestcaffray"
-    ],
-    "jobTitle": "Cybersecurity Enthusiast",
-    "worksFor": {
-      "@type": "Organization",
-      "name": "Independent"
-    }
-  }
-  </script>
+[data-theme="light"] {
+  --bg: #ffffff;
+  --card: #f5f7fa;
+  --fg: #222;
+  --muted: #555;
+  --acc: #004aad;
+  --bd: rgba(0,0,0,.1);
+}
+
+html, body {
+  margin: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;
+}
+
+.wrap { max-width: 1100px; margin: 0 auto; padding: 36px 24px; }
+h1 { margin: 0 0 8px 0; }
+.muted { color: var(--muted); }
+.grid { display: grid; gap: 18px; grid-template-columns: repeat(auto-fill,minmax(280px,1fr)); }
+.card { background: var(--card); border: 1px solid var(--bd); border-radius: 16px; padding: 16px; }
+.card a { color: var(--acc); text-decoration: none; }
+.pill { display: inline-block; margin-right: 6px; margin-top: 8px; padding: 4px 10px; border-radius: 999px; background: rgba(132,169,255,.12); color: var(--acc); font-size: 12px; }
+.card-img { width: 100%; height: 160px; object-fit: cover; border-radius: 12px; margin-bottom: 12px; display: block; background: #0d1528; }
+.excerpt { color: var(--muted); font-size: 14px; line-height: 1.35; margin-top: 6px; }
+header { margin-bottom: 18px; display: flex; justify-content: space-between; align-items: center; }
+h2 { margin-top: 24px; }
+.view-all { display: inline-block; margin-top: 20px; padding: 10px 15px; background-color: #238636; color: white; border-radius: 6px; text-decoration: none; font-weight: bold; }
+.view-all:hover { background-color: #2ea043; }
+.theme-toggle {
+  background: var(--card);
+  color: var(--fg);
+  border: 1px solid var(--bd);
+  border-radius: 6px;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+</style>
 </head>
 <body>
-  <div class="wrap">
-    <header>
+<div class="wrap">
+  <header>
+    <div>
       <h1>Forrest Caffray</h1>
       <p class="muted">TryHackMe & HTB write-ups, BSides notes, and projects.</p>
-    </header>
+    </div>
+    <button class="theme-toggle" id="themeToggle">Toggle Theme</button>
+  </header>
 
-    <main>
-      <h2>Latest posts</h2>
-      <div id="posts" class="grid" aria-live="polite">
-        <div class="card"><strong>First run pending.</strong><br><span class="muted">posts.json will appear after the workflow runs.</span></div>
-      </div>
+  <main>
+    <h2>Latest posts</h2>
+    <div id="posts" class="grid" aria-live="polite">
+      <div class="card"><strong>First run pending.</strong><br><span class="muted">posts.json will appear after the workflow runs.</span></div>
+    </div>
 
-      <a class="view-all" href="https://forrest.hashnode.dev" target="_blank" rel="noopener">View all posts</a>
+    <a class="view-all" href="https://forrest.hashnode.dev" target="_blank" rel="noopener">View all posts</a>
 
-      <h2>Links</h2>
-      <p>
-        Primary blog: <a href="https://forrest.hashnode.dev" target="_blank" rel="noopener">Hashnode</a> ·
-        Cross-posts: <a href="https://dev.to/forrestcaffray" target="_blank" rel="noopener">Dev.to</a> ·
-        <a href="https://medium.com/@forrestcaffray" target="_blank" rel="noopener">Medium</a>
-      </p>
-    </main>
-  </div>
+    <h2>Links</h2>
+    <p>
+      Primary blog: <a href="https://forrest.hashnode.dev" target="_blank" rel="noopener">Hashnode</a> ·
+      Cross-posts: <a href="https://dev.to/forrestcaffray" target="_blank" rel="noopener">Dev.to</a> ·
+      <a href="https://medium.com/@forrestcaffray" target="_blank" rel="noopener">Medium</a>
+    </p>
+  </main>
+</div>
 
-  <script>
-  (async () => {
-    const el = document.getElementById('posts');
-    const clip = (s, n=180) => s && s.length > n ? s.slice(0, n - 1) + "…" : (s || "");
-    const fmt = d => {
-      try { return new Date(d).toLocaleDateString(); } catch { return ""; }
-    };
+<script>
+// Theme handling
+const root = document.documentElement;
+const toggleBtn = document.getElementById('themeToggle');
+const storedTheme = localStorage.getItem('theme');
+if (storedTheme) {
+  root.setAttribute('data-theme', storedTheme);
+} else if (window.matchMedia('(prefers-color-scheme: light)').matches) {
+  root.setAttribute('data-theme', 'light');
+}
 
-    try {
-      const res = await fetch('posts.json', { cache: 'no-store' });
-      if (!res.ok) throw new Error('No posts.json yet');
-      const items = await res.json();
+toggleBtn.addEventListener('click', () => {
+  const current = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+  root.setAttribute('data-theme', current);
+  localStorage.setItem('theme', current);
+});
 
-      if (!Array.isArray(items) || items.length === 0) {
-        el.innerHTML = `<div class="card"><strong>No posts found.</strong></div>`;
-        return;
-      }
+// Posts feed
+(async () => {
+  const el = document.getElementById('posts');
+  const clip = (s, n=180) => s && s.length > n ? s.slice(0, n - 1) + "…" : (s || "");
+  const fmt = d => {
+    try { return new Date(d).toLocaleDateString(); } catch { return ""; }
+  };
 
-      el.innerHTML = items.map(p => `
-        <article class="card">
-          ${p.image ? `<img class="card-img" src="${p.image}" alt="">` : ``}
-          <h3><a href="${p.url}" target="_blank" rel="noopener">${p.title}</a></h3>
-          <div class="muted">${fmt(p.date)}</div>
-          ${p.brief ? `<p class="excerpt">${clip(p.brief, 180)}</p>` : ``}
-          <div>${(p.tags||[]).slice(0,3).map(t=>`<span class="pill">${t}</span>`).join('')}</div>
-        </article>
-      `).join('');
-    } catch (e) {
-      console.warn('posts.json not ready yet:', e);
+  try {
+    const res = await fetch('posts.json', { cache: 'no-store' });
+    if (!res.ok) throw new Error('No posts.json yet');
+    const items = await res.json();
+
+    if (!Array.isArray(items) || items.length === 0) {
+      el.innerHTML = `<div class="card"><strong>No posts found.</strong></div>`;
+      return;
     }
-  })();
-  </script>
+
+    el.innerHTML = items.map(p => `
+      <article class="card">
+        ${p.image ? `<img class="card-img" src="${p.image}" alt="">` : ``}
+        <h3><a href="${p.url}" target="_blank" rel="noopener">${p.title}</a></h3>
+        <div class="muted">${fmt(p.date)}</div>
+        ${p.brief ? `<p class="excerpt">${clip(p.brief, 180)}</p>` : ``}
+        <div>${(p.tags||[]).slice(0,3).map(t=>`<span class="pill">${t}</span>`).join('')}</div>
+      </article>
+    `).join('');
+  } catch (e) {
+    console.warn('posts.json not ready yet:', e);
+  }
+})();
+</script>
 </body>
 </html>
