@@ -5,7 +5,7 @@ on:
   schedule:
     - cron: '17 6 * * *'  # daily at 06:17 UTC
   push:
-    branches: [ main ]
+    branches: [ "main" ]
 
 permissions:
   contents: write
@@ -19,24 +19,28 @@ jobs:
 
       - name: Fetch RSS & generate posts.json
         run: |
-          RSS_URL="https://forrest.hashnode.dev/rss.xml"  # <-- CHANGE THIS
+          RSS_URL="https://forrest.hashnode.dev/rss.xml"
           curl -sL "$RSS_URL" -o rss.xml
-          python3 - << 'PY'
-import xml.etree.ElementTree as ET, json
-from datetime import datetime
-root = ET.parse('rss.xml').getroot()
-items=[]
-for item in root.findall('.//item'):
-    title=(item.findtext('title') or '').strip()
-    link=(item.findtext('link') or '').strip()
-    pub=(item.findtext('pubDate') or '').strip()
-    try: date=datetime.strptime(pub, '%a, %d %b %Y %H:%M:%S %Z').isoformat()
-    except Exception: date=pub
-    tags=[c.text.strip() for c in item.findall('category') if c is not None and c.text]
-    items.append({'title':title,'url':link,'date':date,'tags':tags})
-items=sorted(items, key=lambda x: x['date'], reverse=True)[:24]
-open('posts.json','w').write(json.dumps(items, indent=2))
-PY
+          python3 - <<'PY'
+          import xml.etree.ElementTree as ET, json
+          from datetime import datetime
+
+          root = ET.parse('rss.xml').getroot()
+          items = []
+          for item in root.findall('.//item'):
+              title = (item.findtext('title') or '').strip()
+              link  = (item.findtext('link') or '').strip()
+              pub   = (item.findtext('pubDate') or '').strip()
+              try:
+                  date = datetime.strptime(pub, '%a, %d %b %Y %H:%M:%S %Z').isoformat()
+              except Exception:
+                  date = pub
+              tags = [c.text.strip() for c in item.findall('category') if c is not None and c.text]
+              items.append({'title': title, 'url': link, 'date': date, 'tags': tags})
+
+          items = sorted(items, key=lambda x: x['date'], reverse=True)[:24]
+          open('posts.json', 'w').write(json.dumps(items, indent=2))
+          PY
 
       - name: Commit changes
         run: |
