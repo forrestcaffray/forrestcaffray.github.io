@@ -3,7 +3,7 @@ name: Update posts from Hashnode (API)
 on:
   workflow_dispatch:
   schedule:
-    - cron: '17 6 * * *'
+    - cron: '17 6 * * *' # daily at 06:17 UTC
   push:
     branches: [ "main" ]
 
@@ -27,18 +27,11 @@ jobs:
           ls -l
           echo "----- posts.json (first 200 bytes) -----"
           head -c 200 posts.json || true
-          echo
 
-            - name: Commit posts.json
+      - name: Commit posts.json
         run: |
-          set -euxo pipefail
-          if [ -f posts.json ]; then
-            git config user.name "github-actions"
-            git config user.email "actions@users.noreply.github.com"
-            git add posts.json
-            git commit -m "Update posts.json from Hashnode API" || echo "Nothing to commit"
-            git push || true
-          else
-            echo "posts.json not found" >&2
-            exit 1
-          fi
+          git config --global user.name "forrestcaffray"
+          git config --global user.email "forrestcaffray@users.noreply.github.com"
+          git add posts.json
+          git commit -m "Update posts.json" || echo "No changes to commit"
+          git push
