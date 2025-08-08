@@ -39,8 +39,11 @@ jobs:
           echo '    <changefreq>weekly</changefreq>' >> sitemap.xml
           echo '    <priority>1.0</priority>' >> sitemap.xml
           echo '  </url>' >> sitemap.xml
-          # Only include latest 50 posts
-          jq -r '.[0:50] | .[] | "  <url>\n    <loc>\(.url)</loc>\n    <lastmod>\(.date | split(\"T\")[0])</lastmod>\n    <changefreq>monthly</changefreq>\n    <priority>0.8</priority>\n  </url>"' posts.json >> sitemap.xml
+          # Sort posts newest to oldest, take latest 50
+          jq -r 'sort_by(.date) | reverse | .[0:50] |
+            .[] |
+            "  <url>\n    <loc>\(.url)</loc>\n    <lastmod>\(.date | split(\"T\")[0])</lastmod>\n    <changefreq>monthly</changefreq>\n    <priority>0.8</priority>\n  </url>"
+          ' posts.json >> sitemap.xml
           echo '</urlset>' >> sitemap.xml
 
       - name: Commit posts.json
