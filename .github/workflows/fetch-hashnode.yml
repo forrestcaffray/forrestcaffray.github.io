@@ -1,0 +1,51 @@
+name: Update posts from Hashnode RSS
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 6 * * *'  # daily at 06:17 UTC
+  push:
+    branches: [ main ]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Fetch RSS & generate posts.json
+        run: |
+          RSS_URL="https://forrest.hashnode.dev/rss.xml"  # <-- CHANGE THIS
+          curl -sL "$RSS_URL" -o rss.xml
+          python3 - << 'PY'
+import xml.etree.ElementTree as ET, json
+from datetime import datetime
+root = ET.parse('rss.xml').getroot()
+items=[]
+for item in root.findall('.//item'):
+    title=(item.findtext('title') or '').strip()
+    link=(item.findtext('link') or '').strip()
+    pub=(item.findtext('pubDate') or '').strip()
+    try: date=datetime.strptime(pub, '%a, %d %b %Y %H:%M:%S %Z').isoformat()
+    except Exception: date=pub
+    tags=[c.text.strip() for c in item.findall('category') if c is not None and c.text]
+    items.append({'title':title,'url':link,'date':date,'tags':tags})
+items=sorted(items, key=lambda x: x['date'], reverse=True)[:24]
+open('posts.json','w').write(json.dumps(items, indent=2))
+PY
+
+      - name: Commit changes
+        run: |
+          if git diff --quiet posts.json 2>/dev/null; then
+            echo "No changes in posts.json"
+          else
+            git config user.name "github-actions"
+            git config user.email "actions@users.noreply.github.com"
+            git add posts.json
+            git commit -m "Update posts.json from Hashnode RSS"
+            git push
+          fi
