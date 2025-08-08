@@ -1,9 +1,9 @@
-name: Update posts from Hashnode RSS
+name: Update posts from Hashnode RSS (debug)
 
 on:
   workflow_dispatch:
   schedule:
-    - cron: '17 6 * * *'  # daily at 06:17 UTC
+    - cron: '17 6 * * *'   # daily at 06:17 UTC
   push:
     branches: [ "main" ]
 
@@ -17,20 +17,41 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-            - name: Fetch RSS & generate posts.json
+      - name: Fetch RSS (with debug)
         run: |
-          RSS_URL="https://forrest.hashnode.dev/rss.xml"
+          set -euxo pipefail
+          RSS_URL="https://forrest.hashnode.dev/rss.xml"   # <-- your feed
           echo "Fetching from: $RSS_URL"
-          curl -A "Mozilla/5.0" -sL -D headers.txt "$RSS_URL" -o rss.xml
+
+          # Fetch with redirects + browser UA + compression
+          curl -A "Mozilla/5.0" -sL --compressed -D headers.txt "$RSS_URL" -o rss.xml
+
           echo "----- HEADERS -----"
-          cat headers.txt
+          cat headers.txt || true
+
           echo "----- FIRST 400 CHARS -----"
           head -c 400 rss.xml || true
+          echo
+          echo "----- FILE TYPE -----"
+          file rss.xml || true
+
+      - name: Generate posts.json
+        run: |
           python3 - <<'PY'
-          import xml.etree.ElementTree as ET, json
+          import xml.etree.ElementTree as ET, json, sys
           from datetime import datetime
 
-          root = ET.parse('rss.xml').getroot()
+          try:
+              root = ET.parse('rss.xml').getroot()
+          except Exception as e:
+              print("XML parse failed:", e)
+              # Print the first ~800 characters to the log to see what's inside
+              try:
+                  print(open('rss.xml','rb').read(800).decode('utf-8','replace'))
+              except Exception:
+                  pass
+              sys.exit(1)
+
           items = []
           for item in root.findall('.//item'):
               title = (item.findtext('title') or '').strip()
@@ -45,10 +66,11 @@ jobs:
 
           items = sorted(items, key=lambda x: x['date'], reverse=True)[:24]
           open('posts.json', 'w').write(json.dumps(items, indent=2))
+          print("Wrote posts.json with", len(items), "items")
           PY
 
-
       - name: Commit changes
+        if: success()
         run: |
           if git diff --quiet posts.json 2>/dev/null; then
             echo "No changes in posts.json"
@@ -59,3 +81,12 @@ jobs:
             git commit -m "Update posts.json from Hashnode RSS"
             git push
           fi
+
+      - name: Upload rss.xml (always)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rss-debug
+          path: |
+            rss.xml
+            headers.txt
