@@ -26,7 +26,15 @@ try:
               publication(host: $host) {
                 posts(first: $first) {
                   edges {
-                    node { title slug url publishedAt tags { name } }
+                    node {
+                      title
+                      slug
+                      url
+                      publishedAt
+                      brief
+                      coverImage { url }   # 👈 grab cover
+                      tags { name }
+                    }
                   }
                 }
               }
@@ -39,14 +47,24 @@ try:
     for e in edges:
         n = e.get("node") or {}
         url = n.get("url") or f"https://{HOST}/{n.get('slug','')}"
+        img = None
+        ci = n.get("coverImage")
+        if isinstance(ci, dict):
+            img = ci.get("url")
+        # Fallbacks some themes use:
+        if not img:
+            img = n.get("coverImageUrl") or n.get("cover")  # harmless if missing
         items.append({
             "title": (n.get("title") or "").strip(),
             "url": url,
             "date": (n.get("publishedAt") or "").strip(),
+            "brief": (n.get("brief") or "").strip(),
+            "image": img,
             "tags": [t.get("name","") for t in (n.get("tags") or []) if t and t.get("name")]
         })
 except Exception as e:
     print("GraphQL fetch failed:", e, file=sys.stderr)
+
 
 # Fallback to legacy API if needed
 if not items:
