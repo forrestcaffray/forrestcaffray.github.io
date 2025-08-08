@@ -1,10 +1,32 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Primary SEO -->
   <title>Forrest Caffray — Cybersecurity Portfolio</title>
-  <meta name="description" content="TryHackMe & HTB write-ups, BSides notes, and security projects." />
+  <meta name="description" content="TryHackMe & HackTheBox write-ups, BSides notes, and security projects from Forrest Caffray." />
+  <meta name="author" content="Forrest Caffray" />
+
+  <!-- Open Graph (for social shares) -->
+  <meta property="og:title" content="Forrest Caffray — Cybersecurity Portfolio" />
+  <meta property="og:description" content="CTF write-ups, security research, and projects." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://forrestcaffray.github.io/" />
+  <meta property="og:image" content="https://forrestcaffray.github.io/cover.jpg" />
+
+  <!-- Twitter Card (also privacy-safe) -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Forrest Caffray — Cybersecurity Portfolio" />
+  <meta name="twitter:description" content="CTF write-ups, security research, and projects." />
+  <meta name="twitter:image" content="https://forrestcaffray.github.io/cover.jpg" />
+
+  <!-- Robots & sitemap -->
+  <meta name="robots" content="index, follow" />
+  <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml" />
+
+  <!-- Styles -->
   <style>
     :root{--bg:#0b1220;--card:#101a2b;--fg:#e5ecff;--muted:#9db1d8;--acc:#84a9ff;--bd:rgba(255,255,255,.07)}
     html,body{margin:0;height:100%}
@@ -19,7 +41,29 @@
     .excerpt{color:var(--muted);font-size:14px;line-height:1.35;margin-top:6px}
     header{margin-bottom:18px}
     h2{margin-top:24px}
+    .view-all{display:inline-block;margin-top:20px;padding:10px 15px;background-color:#238636;color:white;border-radius:6px;text-decoration:none;font-weight:bold}
+    .view-all:hover{background-color:#2ea043}
   </style>
+
+  <!-- Structured data for search engines (no tracking) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Forrest Caffray",
+    "url": "https://forrestcaffray.github.io/",
+    "sameAs": [
+      "https://forrest.hashnode.dev",
+      "https://dev.to/forrestcaffray",
+      "https://medium.com/@forrestcaffray"
+    ],
+    "jobTitle": "Cybersecurity Enthusiast",
+    "worksFor": {
+      "@type": "Organization",
+      "name": "Independent"
+    }
+  }
+  </script>
 </head>
 <body>
   <div class="wrap">
@@ -33,6 +77,8 @@
       <div id="posts" class="grid" aria-live="polite">
         <div class="card"><strong>First run pending.</strong><br><span class="muted">posts.json will appear after the workflow runs.</span></div>
       </div>
+
+      <a class="view-all" href="https://forrest.hashnode.dev" target="_blank" rel="noopener">View all posts</a>
 
       <h2>Links</h2>
       <p>
@@ -71,7 +117,6 @@
         </article>
       `).join('');
     } catch (e) {
-      // Keep the placeholder if fetch fails
       console.warn('posts.json not ready yet:', e);
     }
   })();
